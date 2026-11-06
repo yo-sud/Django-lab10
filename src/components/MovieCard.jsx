@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Button from './Button.jsx'
 
 function MovieCard({ movie, onBuy }) {
   const [selectedTime, setSelectedTime] = useState(null)
@@ -31,26 +32,26 @@ function MovieCard({ movie, onBuy }) {
           <ul className="movie-card__times">
             {movie.schedule.map((time) => (
               <li key={time}>
-                <button
-                  type="button"
+                <Button
+                  variant="ghost"
                   className={`time-btn ${selectedTime === time ? 'time-btn--active' : ''}`}
                   onClick={() => selectTime(time)}
                   aria-pressed={selectedTime === time}
                 >
                   {time}
-                </button>
+                </Button>
               </li>
             ))}
           </ul>
         </div>
-        <button
-          type="button"
-          className="btn movie-card__buy"
+        <Button
+          variant="primary"
+          className="movie-card__buy"
           onClick={handleBuy}
           disabled={!selectedTime}
         >
           {confirmed ? '¡Entrada reservada!' : 'Comprar entrada'}
-        </button>
+        </Button>
       </div>
     </article>
   )

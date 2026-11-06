@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Button from './Button.jsx'
 import MovieCard from './MovieCard.jsx'
 
 function MovieList({ movies, onBuy }) {
@@ -30,15 +31,15 @@ function MovieList({ movies, onBuy }) {
           />
           <div className="movie-list__filters" role="group" aria-label="Filtrar por clasificación">
             {classifications.map((option) => (
-              <button
+              <Button
                 key={option}
-                type="button"
+                variant="ghost"
                 className={`filter-btn ${classification === option ? 'filter-btn--active' : ''}`}
                 onClick={() => setClassification(option)}
                 aria-pressed={classification === option}
               >
                 {option}
-              </button>
+              </Button>
             ))}
           </div>
         </div>

@@ -12,7 +12,7 @@ function Hero({ movie }) {
             <span aria-hidden="true">★</span> {movie.rating}
           </span>
         </div>
-        <a href="#cartelera" className="btn hero__cta">Ver cartelera</a>
+        <a href="#cartelera" className="btn btn--primary hero__cta">Ver cartelera</a>
       </div>
     </section>
   )
