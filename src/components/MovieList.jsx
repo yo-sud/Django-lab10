@@ -3,13 +3,13 @@ import Button from './Button.jsx'
 import MovieCard from './MovieCard.jsx'
 import MovieSearch from './MovieSearch.jsx'
 
-function MovieList({ movies, onBuy, favorites, onToggleFavorite, query, onQueryChange }) {
+function MovieList({ movies, onBuy, favorites, onToggleFavorite, query, onQueryChange, debouncedQuery }) {
   const [classification, setClassification] = useState('Todas')
 
   const classifications = ['Todas', ...new Set(movies.map((movie) => movie.classification))]
 
   const filtered = movies.filter((movie) => {
-    const matchesQuery = movie.title.toLowerCase().includes(query.toLowerCase())
+    const matchesQuery = movie.title.toLowerCase().includes(debouncedQuery.toLowerCase())
     const matchesClassification =
       classification === 'Todas' || movie.classification === classification
     return matchesQuery && matchesClassification
@@ -44,7 +44,11 @@ function MovieList({ movies, onBuy, favorites, onToggleFavorite, query, onQueryC
         </div>
 
         {filtered.length === 0 ? (
-          <p className="movie-list__empty">No se encontraron películas con esos criterios.</p>
+          <p className="movie-list__empty">
+            {debouncedQuery
+              ? `No se encontraron películas que coincidan con «${debouncedQuery}».`
+              : 'No se encontraron películas con esos criterios.'}
+          </p>
         ) : (
           <ul className="movie-list__grid" role="list" aria-label="Películas en cartelera">
             {filtered.map((movie) => (
