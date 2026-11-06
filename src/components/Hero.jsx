@@ -1,4 +1,6 @@
-function Hero({ movie }) {
+import MovieSearch from './MovieSearch.jsx'
+
+function Hero({ movie, query, onQueryChange }) {
   return (
     <section className="hero">
       <div className="hero__background" style={{ backgroundImage: `url(${movie.image})` }} />
@@ -12,7 +14,16 @@ function Hero({ movie }) {
             <span aria-hidden="true">★</span> {movie.rating}
           </span>
         </div>
-        <a href="#cartelera" className="btn btn--primary hero__cta">Ver cartelera</a>
+        <div className="hero__search">
+          <MovieSearch
+            id="search-hero"
+            value={query}
+            onChange={onQueryChange}
+            placeholder="Buscar en la cartelera..."
+            label="Buscar películas desde el banner"
+          />
+          <a href="#cartelera" className="btn btn--primary hero__cta">Ver cartelera</a>
+        </div>
       </div>
     </section>
   )

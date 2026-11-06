@@ -39,7 +39,7 @@ function App() {
     <>
       <Header tickets={tickets} />
       <main>
-        <Hero movie={featured} />
+        <Hero movie={featured} query={query} onQueryChange={handleQueryChange} />
         <MovieList
           movies={movies}
           onBuy={handleBuy}
