@@ -5,9 +5,18 @@ import MovieList from './components/MovieList.jsx'
 import Footer from './components/Footer.jsx'
 import { movies } from './data/movies.js'
 
+const FAVORITES_KEY = 'cine-plus:favorites'
+
 function App() {
   const [tickets, setTickets] = useState(0)
-  const [favorites, setFavorites] = useState([])
+  const [favorites, setFavorites] = useState(() => {
+    try {
+      const stored = localStorage.getItem(FAVORITES_KEY)
+      return stored ? JSON.parse(stored) : []
+    } catch {
+      return []
+    }
+  })
   const [query, setQuery] = useState('')
   const [debouncedQuery, setDebouncedQuery] = useState('')
   const featured = movies[0]
@@ -21,6 +30,10 @@ function App() {
       prev.includes(movieId) ? prev.filter((id) => id !== movieId) : [...prev, movieId]
     )
   }
+
+  useEffect(() => {
+    localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites))
+  }, [favorites])
 
   useEffect(() => {
     const timer = setTimeout(() => {
