@@ -3,8 +3,7 @@ import Button from './Button.jsx'
 import MovieCard from './MovieCard.jsx'
 import MovieSearch from './MovieSearch.jsx'
 
-function MovieList({ movies, onBuy, favorites, onToggleFavorite }) {
-  const [query, setQuery] = useState('')
+function MovieList({ movies, onBuy, favorites, onToggleFavorite, query, onQueryChange }) {
   const [classification, setClassification] = useState('Todas')
 
   const classifications = ['Todas', ...new Set(movies.map((movie) => movie.classification))]
@@ -25,7 +24,7 @@ function MovieList({ movies, onBuy, favorites, onToggleFavorite }) {
           <MovieSearch
             id="search-movies"
             value={query}
-            onChange={setQuery}
+            onChange={onQueryChange}
             placeholder="Buscar película por título..."
             label="Buscar película por título"
           />

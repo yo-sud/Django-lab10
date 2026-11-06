@@ -8,6 +8,7 @@ import { movies } from './data/movies.js'
 function App() {
   const [tickets, setTickets] = useState(0)
   const [favorites, setFavorites] = useState([])
+  const [query, setQuery] = useState('')
   const featured = movies[0]
 
   const handleBuy = () => {
@@ -30,6 +31,8 @@ function App() {
           onBuy={handleBuy}
           favorites={favorites}
           onToggleFavorite={toggleFavorite}
+          query={query}
+          onQueryChange={setQuery}
         />
       </main>
       <Footer />
