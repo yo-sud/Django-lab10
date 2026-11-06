@@ -7,10 +7,17 @@ import { movies } from './data/movies.js'
 
 function App() {
   const [tickets, setTickets] = useState(0)
+  const [favorites, setFavorites] = useState([])
   const featured = movies[0]
 
   const handleBuy = () => {
     setTickets((prev) => prev + 1)
+  }
+
+  const toggleFavorite = (movieId) => {
+    setFavorites((prev) =>
+      prev.includes(movieId) ? prev.filter((id) => id !== movieId) : [...prev, movieId]
+    )
   }
 
   return (
@@ -18,7 +25,12 @@ function App() {
       <Header tickets={tickets} />
       <main>
         <Hero movie={featured} />
-        <MovieList movies={movies} onBuy={handleBuy} />
+        <MovieList
+          movies={movies}
+          onBuy={handleBuy}
+          favorites={favorites}
+          onToggleFavorite={toggleFavorite}
+        />
       </main>
       <Footer />
     </>

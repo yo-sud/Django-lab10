@@ -2,7 +2,7 @@ import { useState } from 'react'
 import Button from './Button.jsx'
 import MovieCard from './MovieCard.jsx'
 
-function MovieList({ movies, onBuy }) {
+function MovieList({ movies, onBuy, favorites, onToggleFavorite }) {
   const [query, setQuery] = useState('')
   const [classification, setClassification] = useState('Todas')
 
@@ -50,7 +50,12 @@ function MovieList({ movies, onBuy }) {
           <ul className="movie-list__grid" role="list" aria-label="Películas en cartelera">
             {filtered.map((movie) => (
               <li key={movie.id} className="movie-list__item">
-                <MovieCard movie={movie} onBuy={onBuy} />
+                <MovieCard
+                  movie={movie}
+                  onBuy={onBuy}
+                  isFavorite={favorites.includes(movie.id)}
+                  onToggleFavorite={onToggleFavorite}
+                />
               </li>
             ))}
           </ul>
