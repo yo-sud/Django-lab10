@@ -176,6 +176,84 @@ Todas están declaradas en `package.json`. `node_modules` y `dist` se excluyen d
 | Criterio | Evidencia |
 |----------|-----------|
 | Crea el proyecto con Vite y lo levanta | Proyecto generado con Vite, dependencias instaladas y `npm run dev` operativo; `npm run build` compila sin errores |
-| Componentes funcionales con JSX compuestos en una interfaz | `Header`, `Hero`, `MovieList`, `MovieCard` y `Footer`, cada uno con una responsabilidad, compuestos en `App.jsx` |
-| Datos del padre a los hijos mediante props | `App → Hero (movie)`, `App → MovieList (movies)`, `MovieList → MovieCard (movie)` |
-| Repositorio con interfaz y observaciones | Este README explica la estructura, las props y las dependencias; las observaciones están en la sección anterior y en `ERRORES_TIPICOS.md` |
+| Componentes funcionales con JSX compuestos en una interfaz | `Header`, `Hero`, `MovieList`, `MovieCard` y `Button`, cada uno con una responsabilidad, compuestos en `App.jsx` |
+| Datos del padre a los hijos mediante props | `App → Hero (movie)`, `App → MovieList (movies)`, `MovieList → MovieCard (movie)`; búsqueda y favoritas viajan como props también |
+| Repositorio con interfaz y observaciones | Este README explica la estructura, las props y las dependencias; las nuevas observaciones del Lab10 aparecen a continuación |
+
+## Observaciones del laboratorio (Lab 10 — Componentes y Eventos)
+
+### Componente `Button` reutilizable con props
+
+- **Dónde se usa**: sustituye los botones escritos a mano en tres lugares distintos del código:
+  1. **Botones de selección de horario** en `MovieCard` (`variant="ghost"`, `type="button"`); cada horario es un `children` diferente.
+  2. **Botón de compra** en `MovieCard` (`variant="primary"`); gestiona `disabled` y texto condicional (`confirmed ? '¡Entrada reservada!' : 'Comprar entrada'`).
+  3. **Botones de filtro** en `MovieList` (`variant="ghost"`); la variante activa se maneja por props (`filter-btn--active` es una clase estática, pero la lógica de estado pertenece al componente padre).
+- **Prop `children`**: todas las variantes reciben su contenido por esta prop, lo que permite un solo componente para casos visualmente distintos.
+- **Prop `variant`**: tres valores (`primary`, `ghost`, `danger`) definiendo la apariencia mediante CSS clases prefijadas (`btn--primary`, `btn--ghost`, `btn--danger`) en `src/styles/index.css`. No hay duplicación de código: un solo componente `Button.jsx` gestiona los tres casos.
+
+### `useState` + eventos del usuario
+
+- **Estado elevado**: el estado de entradas (`tickets`) vive en `App` y baja como prop `tickets` a `Header`; el buscador (`query`) también vive en `App` y se pasa a `Hero` y a `MovieList` por props, cumpliendo *"el estado vive donde debe y la interfaz responde a cada evento sin recargar"*.
+- **Sin manipulación directa del DOM**: no hay `document.getElementById`, `innerHTML` ni recargas de página. Todo evento (`onClick`, `onChange`, `onBuy`) es gestionado por React a través de handlers pasados por props.
+- **Favoritas con `useState`**: `useState(() => ...)` inicializa el arreglo desde `localStorage`, y `setFavorites((prev) => prev.includes(id) ? ... : ...)` nunca muta el estado ajeno. Los botones de cada `MovieCard` llaman a `onToggleFavorite(id)` recibido por props, nunca tocan `setState` del padre directamente.
+
+### Comunicación hacia arriba (hijo → padre)
+
+- **El hijo avisa al padre por la función recibida**: `MovieCard` ejecuta `onToggleFavorite(id)` sin tocar el estado propio del padre. Se recibe `isFavorite` como dato (`prop`) y se pinta `★ En favoritas` o `☆ Añadir a favoritas` según él.
+- **No duplica el estado**: el único estado de favoritas es el de `App`. No hay copia redundante en `MovieCard` ni en `MovieList`.
+- **Persistencia en `localStorage`**: cada cambio guarda `JSON.stringify(favorites)` en `localStorage` (`useEffect` al finalizar); al recargar la página, `useState` initializer lee `JSON.parse(localStorage.getItem(...))`. Las favoritas sobreviven a recargas.
+
+### Componentes y Eventos completados (checklist)
+
+| Criterio | Hecho |
+|---|---|
+| Button reutilizable con children y variantes | ✅ (`src/components/Button.jsx`, usado en horarios, compra, filtros) |
+| useState para favoritas en App | ✅ (`src/App.jsx`, inicializador con localStorage + toggle hacia arriba) |
+| Buscador entrada controlada | ✅ (`src/components/MovieSearch.jsx`, usado en banner y lista) |
+| Favoritas guardadas en localStorage | ✅ (`App.jsx`, initializer + useEffect con try/catch) |
+| Debounce en el filtrado (300 ms) | ✅ (`useEffect` en `App.jsx`, logs `[tecleo]` vs `[filtro]` en consola) |
+| Estado vacío mostrado con texto del buscador | ✅ (`MovieList.jsx`, mensaje "No se encontraron películas que coincidan con «X».") |
+| Buscador en el banner integrando filtrado global | ✅ (`Hero.jsx`, el mismo `query`/handler que en `MovieList`) |
+| Commit + push realizados antes del plazo | ✅ (último commit: `a82c3b4`) |
+
+### Datos que la aplicación recuerda — dónde se decidió ponerlos y por qué
+
+| Dato | Componente que lo almacena | Justificación |
+|---|---|---|
+| `tickets` (contador de entradas) | `App` (via prop `tickets → Header`) | Estado global compartido: `Header` necesita mostrar el número; elevarlo a `App` evita que cada componente gestione su propio contador y garantiza una única fuente de verdad. |
+| `favorites` (array de IDs de películas favoritas) | `App` con `useState` initializer + `localStorage` persistencia | La persistencia transaccional (sobrevive recarga) justifica ponerlo en `App`. Usar `localStorage` en cada hijo rompería la consistencia; el patrón "lift state up + persist at root" es el estándar para datos que deben sobrevivir a recargas. |
+| `query` (texto del buscador) | `App` (pasado por props a `Hero` y `MovieList`) | Queremos que el filtrado sea **compartido** entre el buscador del banner y el de la lista, de modo que buscar "Dune" en cualquiera de los dos filtre la misma cartelera. Vivir en `App` permite ese acoplamiento controlado sin duplicar estado. |
+| `debouncedQuery` (texto filtrado con retardo) | `App` (estado derivado de `query` vía `useEffect` de 300 ms) | Evita que el filtrado dispare en cada tecla (`onChange` rápido), mejorando rendimiento y reduciendo cálculos innecesarios en `.filter()`. El estado original `query` sigue vivo para la escritura inmediata del usuario. |
+
+### Captura del estado vacío del buscador
+
+![Captura del estado vacío del buscador](screenshot.png)
+*(Vista de la lista con el buscador mostrando "No se encontraron películas que coincidan con «zzz»." y las 8 tarjetas debajo una vez se limpia el texto.)*
+
+---
+
+## Estructura del proyecto (Lab10)
+
+```
+cartelera-cine/
+├── index.html                  Punto de entrada HTML; monta #root
+├── vite.config.js              Configuración de Vite con el plugin de React
+├── package.json                Dependencias y scripts del proyecto
+├── ERRORES_TIPICOS.md          Registro de los tres errores de JSX provocados
+├── public/
+│   └── posters/                Portadas locales de las ocho películas
+└── src/
+    ├── main.jsx                Renderiza <App /> e importa los estilos globales
+    ├── App.jsx                 Compone Header, Hero, MovieList y Footer; mantiene el estado de tickets, favorites y query
+    ├── components/
+    │   ├── Header.jsx          Nombre del cine y navegación; recibe tickets por props
+    │   ├── Hero.jsx            Banner de la película destacada + buscador MovieSearch
+    │   ├── MovieCard.jsx       Tarjeta individual de una película; recibe isFavorite y onToggleFavorite por props
+    │   ├── MovieList.jsx       Lista de tarjetas recorriendo la cartelera; recibe query y onQueryChange por props
+    │   ├── MovieSearch.jsx     Entrada controlada: el texto vive en el estado y onChange lo actualiza
+    │   └── Button.jsx          Componente reutilizable: children + variante (primary/ghost/danger)
+    ├── data/
+    │   └── movies.js           Arreglo con las ocho películas de la cartelera
+    └── styles/
+        └── index.css           Tokens de diseño y estilos de todos los componentes; incluye variantes de Button y estilos de formulario
+```
