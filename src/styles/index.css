@@ -447,24 +447,8 @@ img {
   margin-bottom: 2rem;
 }
 
-.movie-list__search {
+.movie-list__controls .movie-search__input {
   flex: 1 1 240px;
-  padding: 0.75rem 1rem;
-  border: 1px solid #2a2d36;
-  border-radius: var(--border-radius);
-  background-color: var(--color-surface);
-  color: var(--color-text);
-  font-size: 0.9375rem;
-  outline: none;
-  transition: border-color var(--transition);
-}
-
-.movie-list__search::placeholder {
-  color: var(--color-text-muted);
-}
-
-.movie-list__search:focus {
-  border-color: var(--color-accent);
 }
 
 /* ========================================

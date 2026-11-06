@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Button from './Button.jsx'
 import MovieCard from './MovieCard.jsx'
+import MovieSearch from './MovieSearch.jsx'
 
 function MovieList({ movies, onBuy, favorites, onToggleFavorite }) {
   const [query, setQuery] = useState('')
@@ -21,13 +22,12 @@ function MovieList({ movies, onBuy, favorites, onToggleFavorite }) {
         <h2 className="section-title">Cartelera</h2>
 
         <div className="movie-list__controls">
-          <input
-            type="search"
-            className="movie-list__search"
-            placeholder="Buscar película por título..."
+          <MovieSearch
+            id="search-movies"
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            aria-label="Buscar película por título"
+            onChange={setQuery}
+            placeholder="Buscar película por título..."
+            label="Buscar película por título"
           />
           <div className="movie-list__filters" role="group" aria-label="Filtrar por clasificación">
             {classifications.map((option) => (
